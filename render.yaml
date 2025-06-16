@@ -1,0 +1,19 @@
+# render.yaml
+services:
+  - type: web
+    name: jobtrack-api
+    env: node
+    repo: https://github.com/yourusername/jobtrack.git
+    buildCommand: cd server && npm install
+    startCommand: cd server && node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_URL
+        value: https://jobtrack-app.vercel.app
