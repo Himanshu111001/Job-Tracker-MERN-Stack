@@ -149,6 +149,31 @@ This error occurs when you try to use a secret reference in Vercel instead of di
 5. Click "Save"
 6. Redeploy your application
 
+### Error: "Failed to compile" due to ESLint warnings
+
+If your frontend build fails on Vercel with ESLint warnings being treated as errors, this is because Vercel sets the `CI` environment variable to true by default.
+
+**Solution:**
+1. We have updated the project with multiple fixes:
+   - Updated the vercel.json to set CI=false
+   - Modified package.json build script to include CI=false
+   - Added .env and .env.local files with CI=false
+   - Added an .eslintrc file to reduce warning severity
+   - Created an .npmrc file to disable strict warnings
+
+2. To apply these changes:
+   ```
+   git add client/.eslintrc client/.npmrc client/.env client/.env.local client/vercel.json client/package.json
+   git commit -m "Fix: Prevent ESLint warnings from failing build"
+   git push
+   ```
+
+3. If builds still fail, you can manually set the environment variable in the Vercel dashboard:
+   - Go to your project in the Vercel dashboard
+   - Go to Settings > Environment Variables
+   - Add a variable named `CI` with value `false`
+   - Click "Save" and redeploy
+
 ## Monitoring and Maintenance
 
 - Use Render's built-in logs and metrics to monitor backend performance

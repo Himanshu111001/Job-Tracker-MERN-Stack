@@ -33,4 +33,6 @@ axios.interceptors.response.use(
   }
 );
 
-export default {};  // Export empty object as this module is side-effect only
+// This module is side-effect only, so we export a named constant
+const interceptorSetup = {};
+export default interceptorSetup;
