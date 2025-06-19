@@ -36,6 +36,11 @@ app.use(cors({
   credentials: true
 }));
 
+// Health check endpoint for Render
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Logging in development mode
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));

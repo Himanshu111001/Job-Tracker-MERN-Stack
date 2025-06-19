@@ -3,9 +3,11 @@ services:
   - type: web
     name: jobtrack-api
     env: node
-    repo: https://github.com/yourusername/jobtrack.git
+    region: ohio
+    plan: free
     buildCommand: cd server && npm install
     startCommand: cd server && node server.js
+    healthCheckPath: /api/health
     envVars:
       - key: PORT
         value: 10000
@@ -19,3 +21,4 @@ services:
         value: https://jobtrack-app.vercel.app
       - key: ADMIN_INVITE_SECRET
         sync: false
+    autoDeploy: true

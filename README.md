@@ -49,6 +49,8 @@ A full-stack web application for tracking job applications with user authenticat
 - Backend: Render
 - Database: MongoDB Atlas
 
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+
 ## Installation and Setup
 
 ### Prerequisites
