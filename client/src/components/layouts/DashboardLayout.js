@@ -209,9 +209,7 @@ const DashboardLayout = () => {  const navigate = useNavigate();
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Mobile menu */}
+        </div>        {/* Mobile menu */}
         <div
           className={`fixed inset-0 z-40 md:hidden transform transition ease-in-out duration-300 ${
             mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
@@ -224,7 +222,7 @@ const DashboardLayout = () => {  const navigate = useNavigate();
           ></div>
 
           {/* Mobile menu content */}
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-primary-800">
+          <div className="relative flex flex-col max-w-xs w-full h-full bg-primary-800">
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
                 type="button"
@@ -238,7 +236,7 @@ const DashboardLayout = () => {  const navigate = useNavigate();
               </button>
             </div>
 
-            <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+            <div className="flex-1 pt-5 pb-4 overflow-y-auto">
               <div className="flex-shrink-0 flex items-center px-4">
                 <span className="text-white font-bold text-xl">JobTrack</span>
               </div>
