@@ -10,8 +10,7 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/index.html" }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "@react_app_api_url"
+  ],  "env": {
+    "REACT_APP_API_URL": "https://job-tracker-mern-stack.onrender.com/api"
   }
 }

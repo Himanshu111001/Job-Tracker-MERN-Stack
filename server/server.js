@@ -82,11 +82,22 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/job-track
 
 // Handle production setup
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static(path.join(__dirname, '../client/build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+  // For API-only deployment on Render
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'JobTrack API Server', 
+      status: 'running',
+      version: '1.0.0',
+      documentation: 'See API documentation for available endpoints'
+    });
+  });
+
+  // Handle all non-api routes by sending API status
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.status(404).json({ success: false, error: 'Not found. This is a backend API server only.' });
   });
 }
 

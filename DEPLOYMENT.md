@@ -123,6 +123,32 @@ This document provides step-by-step instructions for deploying the JobTrack appl
 - If your Render free tier service is slow to respond after periods of inactivity, this is normal ("spin-up" delay)
 - Consider upgrading to a paid tier for production use
 
+## Common Deployment Errors and Solutions
+
+### Error: "No such file or directory, stat '/opt/render/project/src/client/build/index.html'"
+
+This error occurs because the server is trying to serve the frontend static files, but the client build directory doesn't exist on Render.
+
+**Solution:**
+- This application is designed with separate deployments for frontend and backend
+- The backend server.js has been updated to handle this case and no longer attempts to serve frontend files
+- Make sure you're deploying the frontend separately to Vercel
+
+### Error: "Environment Variable 'REACT_APP_API_URL' references Secret, which does not exist"
+
+This error occurs when you try to use a secret reference in Vercel instead of directly setting the environment variable.
+
+**Solution:**
+1. Go to your Vercel project dashboard
+2. Navigate to "Settings" > "Environment Variables"
+3. Add a new variable with:
+   - Name: `REACT_APP_API_URL`
+   - Value: `https://your-render-app-name.onrender.com/api` (replace with your actual Render URL)
+   - Do NOT use the secret reference syntax (e.g., `@react_app_api_url`)
+4. Make sure to select the environments where this should apply (Production, Preview, Development)
+5. Click "Save"
+6. Redeploy your application
+
 ## Monitoring and Maintenance
 
 - Use Render's built-in logs and metrics to monitor backend performance

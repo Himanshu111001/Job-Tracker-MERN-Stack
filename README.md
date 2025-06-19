@@ -51,6 +51,17 @@ A full-stack web application for tracking job applications with user authenticat
 
 For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
+### Important Deployment Notes
+
+1. **Vercel Environment Variables**:
+   - When deploying to Vercel, you must manually add the environment variable `REACT_APP_API_URL` directly in the Vercel dashboard.
+   - Do NOT use secrets for this variable; input the value directly.
+   - Example value: `https://job-tracker-mern-stack.onrender.com/api`
+
+2. **Render Configuration**:
+   - The server is configured as an API-only service and does not serve the frontend static files.
+   - Frontend and backend must be deployed separately.
+
 ## Installation and Setup
 
 ### Prerequisites
