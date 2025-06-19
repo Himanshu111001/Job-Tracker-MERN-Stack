@@ -21,9 +21,39 @@ const app = express();
 const server = http.createServer(app);
 
 // Socket.io setup
+// Helper function to handle multiple origins
+const getAllowedOrigins = () => {
+  // Default origins - local development and Vercel deployment
+  const defaultOrigins = [
+    'http://localhost:3000', 
+    'https://job-tracker-mern-stack.vercel.app',
+    'https://jobtrack-app.vercel.app'
+  ];
+  
+  // If CLIENT_URL is set, add it to the origins list
+  const clientUrl = process.env.CLIENT_URL;
+  if (clientUrl && !defaultOrigins.includes(clientUrl)) {
+    defaultOrigins.push(clientUrl);
+  }
+  
+  return defaultOrigins;
+};
+
+const allowedOrigins = getAllowedOrigins();
+
 const io = socketIo(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        console.log(`Socket.io blocking origin: ${origin}`);
+        return callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
   }
@@ -32,7 +62,17 @@ const io = socketIo(server, {
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log(`Express blocking origin: ${origin}`);
+      return callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true
 }));
 
