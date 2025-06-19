@@ -39,22 +39,14 @@ const AddJob = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
-    try {
-      const result = await dispatch(createJob(formData)).unwrap();
-      console.log('Job created successfully:', result);
-      
-      // The socket server will emit a notification that will be handled in App.js
-      // No need to manually dispatch anything else here
-      
-      // Navigate to the jobs list after successful creation
-      navigate('/dashboard/jobs');
-    } catch (error) {
-      console.error('Error creating job:', error);
-      // You could add error handling here (e.g., toast notification)
-    }
+    dispatch(createJob(formData)).then((result) => {
+      if (!result.error) {
+        navigate('/dashboard/jobs');
+      }
+    });
   };
 
   return (

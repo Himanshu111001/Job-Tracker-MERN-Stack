@@ -10,10 +10,9 @@ const Register = () => {
     email: '',
     password: '',
     password2: '',
-    role: 'applicant'
   });
   
-  const { name, email, password, password2, role } = formData;
+  const { name, email, password, password2 } = formData;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
@@ -47,8 +46,7 @@ const Register = () => {
       const newUser = {
         name,
         email,
-        password,
-        role
+        password
       };
       
       dispatch(register(newUser));
@@ -150,24 +148,6 @@ const Register = () => {
                   placeholder="••••••••"
                   minLength="6"
                 />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Role
-              </label>
-              <div className="mt-1">
-                <select
-                  id="role"
-                  name="role"
-                  value={role}
-                  onChange={onChange}
-                  className="form-input"
-                >
-                  <option value="applicant">Job Applicant</option>
-                  <option value="admin">Admin</option>
-                </select>
               </div>
             </div>
 

@@ -115,3 +115,46 @@ exports.getUsers = async (req, res, next) => {
     });
   }
 };
+
+// @desc    Create a new admin user (Admin only)
+// @route   POST /api/users/admin
+// @access  Private/Admin
+exports.createAdminUser = async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({
+        success: false,
+        error: 'User already exists'
+      });
+    }
+
+    // Create admin user
+    user = await User.create({
+      name,
+      email,
+      password,
+      role: 'admin'
+    });
+
+    res.status(201).json({
+      success: true,
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error'
+    });
+  }
+};

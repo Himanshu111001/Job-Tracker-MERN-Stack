@@ -34,6 +34,7 @@ This document provides step-by-step instructions for deploying the JobTrack appl
      JWT_SECRET=your_secret_key_here
      MONGODB_URI=your_mongodb_connection_string
      CLIENT_URL=https://your-frontend-url.vercel.app
+     ADMIN_INVITE_SECRET=your_strong_admin_secret_key_here
      ```
    - Click "Create Web Service"
 

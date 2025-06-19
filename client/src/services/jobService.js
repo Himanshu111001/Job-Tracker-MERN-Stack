@@ -44,6 +44,8 @@ const createJob = async (jobData) => {
 
 // Update job
 const updateJob = async (jobId, jobData) => {
+  console.log("JobService: Updating job with ID:", jobId);
+  console.log("JobService: Job data:", jobData);
   const response = await axios.put(`${API_URL}/jobs/${jobId}`, jobData);
   return response.data;
 };

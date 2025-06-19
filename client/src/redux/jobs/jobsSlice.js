@@ -97,13 +97,14 @@ const initialState = {
 
 const jobsSlice = createSlice({
   name: 'jobs',
-  initialState,
-  reducers: {
+  initialState,  reducers: {
     setFilters: (state, action) => {
       state.filters = { ...state.filters, ...action.payload };
     },
     resetJobState: (state) => {
       state.job = null;
+      state.error = null;
+      state.status = 'idle';
     }
   },
   extraReducers: (builder) => {

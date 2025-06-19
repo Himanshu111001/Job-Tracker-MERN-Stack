@@ -1,21 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../redux/auth/authSlice';
+import { getNotifications } from '../../redux/notifications/notificationSlice';
 import { BriefcaseIcon, ChartBarIcon, UserIcon, BellIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon, UsersIcon } from '@heroicons/react/24/outline';
 import { Transition } from '@headlessui/react';
 
-const DashboardLayout = () => {
-  const navigate = useNavigate();
+const DashboardLayout = () => {  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { unreadCount } = useSelector((state) => state.notifications);
+  const { unreadCount, notifications, success } = useSelector((state) => state.notifications);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  
+  // Ensure notifications are loaded when the dashboard layout mounts
+  useEffect(() => {
+    dispatch(getNotifications());
+  }, [dispatch]);
+  
+  // Log when notification state changes (for debugging)
+  useEffect(() => {
+    console.log('DashboardLayout - Notification count updated:', unreadCount);
+    console.log('DashboardLayout - Notifications:', notifications?.length);
+  }, [unreadCount, notifications]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Force navigation to login page even if there was an error during logout
+      navigate('/login');
+    }
   };
 
   const navigation = [

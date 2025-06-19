@@ -17,3 +17,5 @@ services:
         sync: false
       - key: CLIENT_URL
         value: https://jobtrack-app.vercel.app
+      - key: ADMIN_INVITE_SECRET
+        sync: false

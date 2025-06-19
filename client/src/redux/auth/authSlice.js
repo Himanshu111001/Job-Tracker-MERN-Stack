@@ -101,16 +101,23 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async (_, thunkAPI) => {
     try {
-      return await authService.logout();
-    } catch (error) {
-      const message = 
-        (error.response && 
-          error.response.data && 
-          error.response.data.error) || 
-        error.message || 
-        error.toString();
+      // Make the API call to logout with the token still present
+      const result = await authService.logout();
       
-      return thunkAPI.rejectWithValue(message);
+      // Then clear auth token from axios headers
+      const { setAuthToken } = await import('../../utils/setAuthToken');
+      setAuthToken(null);
+      
+      return result;
+    } catch (error) {
+      console.warn("Error during logout process:", error);
+      
+      // Even if the server logout fails, we should still clear the local auth state
+      const { setAuthToken } = await import('../../utils/setAuthToken');
+      setAuthToken(null);
+      
+      // Return success anyway since we're proceeding with local logout
+      return { success: true };
     }
   }
 );
@@ -198,8 +205,15 @@ export const authSlice = createSlice({
         state.isAuthenticated = false;
         state.loading = false;
         state.user = null;
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        state.error = null;
+      })
+      .addCase(logout.rejected, (state) => {
+        // Even if the API call fails, we should still clear auth state
+        state.token = null;
+        state.isAuthenticated = false;
+        state.loading = false;
+        state.user = null;
+        state.error = null;
       });
   }
 });

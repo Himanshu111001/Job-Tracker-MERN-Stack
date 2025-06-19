@@ -9,6 +9,10 @@ const register = async (userData) => {
   if (response.data && response.data.token) {
     localStorage.setItem('token', response.data.token);
     localStorage.setItem('user', JSON.stringify(response.data.user));
+    
+    // Set the auth token in axios headers
+    const { setAuthToken } = require('../utils/setAuthToken');
+    setAuthToken(response.data.token);
   }
 
   return response.data;
@@ -21,17 +25,40 @@ const login = async (userData) => {
   if (response.data && response.data.token) {
     localStorage.setItem('token', response.data.token);
     localStorage.setItem('user', JSON.stringify(response.data.user));
+    
+    // Set the auth token in axios headers
+    const { setAuthToken } = require('../utils/setAuthToken');
+    setAuthToken(response.data.token);
   }
 
   return response.data;
 };
 
 // Logout user
-const logout = async () => {
-  const response = await axios.get(`${API_URL}/auth/logout`);
+const logout = async () => {  try {
+    // Get token directly from localStorage to ensure it's included in this request
+    const token = localStorage.getItem('token');
+    
+    // If token exists, include it explicitly in this request
+    if (token) {
+      await axios.get(`${API_URL}/auth/logout`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        // This makes axios not log this particular request in console
+        silentErrors: true
+      });
+    }
+  } catch (error) {
+    // Silent fail - no console warnings or errors for logout requests
+    // This keeps the console clean during logout
+  }
+  
+  // After the API call (successful or not), clear local storage
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  return response.data;
+  
+  return { success: true };
 };
 
 // Get current user

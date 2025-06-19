@@ -90,7 +90,19 @@ export const deleteNotification = createAsyncThunk(
 export const addRealTimeNotification = createAsyncThunk(
   'notifications/addRealTimeNotification',
   async (notification, thunkAPI) => {
-    return notification;
+    try {
+      // Log the notification for debugging
+      console.log('Processing real-time notification:', notification);
+      
+      // No need to make an API call as this is a socket notification
+      // But we could store it locally or perform other actions if needed
+      
+      // Return the notification to be added to the store
+      return notification;
+    } catch (error) {
+      console.error('Error processing real-time notification:', error);
+      return thunkAPI.rejectWithValue('Failed to process notification');
+    }
   }
 );
 
@@ -197,11 +209,15 @@ export const notificationSlice = createSlice({
         state.error = action.payload;
         state.success = false;
       })
-      
-      // Add Real-time Notification
+        // Add Real-time Notification
       .addCase(addRealTimeNotification.fulfilled, (state, action) => {
+        console.log('Adding real-time notification to Redux store:', action.payload);
+        // Add the new notification to the beginning of the array
         state.notifications = [action.payload, ...state.notifications];
+        // Increment the unread count
         state.unreadCount += 1;
+        // Explicitly mark as successful to trigger UI updates
+        state.success = true;
       });
   }
 });

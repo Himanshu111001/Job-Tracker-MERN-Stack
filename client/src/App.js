@@ -2,7 +2,11 @@ import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUser } from './redux/auth/authSlice';
+import { addRealTimeNotification } from './redux/notifications/notificationSlice';
 import { io } from 'socket.io-client';
+import { setAuthToken } from './utils/setAuthToken';
+// Import axios interceptors for authentication error handling
+import './utils/axiosInterceptors';
 
 // Layout Components
 import ProtectedRoute from './components/routing/ProtectedRoute';
@@ -34,33 +38,62 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 function App() {
   const dispatch = useDispatch();
   const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
-
+  
   // Load user on first render if token exists
   useEffect(() => {
-    dispatch(loadUser());
-  }, [dispatch]);
-
-  // Connect to Socket.io when user is authenticated
+    // Set the auth token for axios on app initialization
+    const token = localStorage.getItem('token');
+    if (token) {
+      setAuthToken(token);
+      dispatch(loadUser());
+    }
+  }, [dispatch]);  // Connect to Socket.io when user is authenticated
   useEffect(() => {
+    let socket;
+    
     if (isAuthenticated && user) {
-      const socket = io(API_URL.replace('/api', ''));
+      // Create socket connection
+      socket = io(API_URL.replace('/api', ''), {
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionAttempts: 5
+      });
       
       // Join user's room for personalized notifications
       socket.on('connect', () => {
+        console.log('Socket connected, joining room for user:', user.id);
         socket.emit('joinRoom', user.id);
+      });      
+      
+      // Handle connection errors
+      socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
       });
-
+      
       // Listen for notifications
       socket.on('notification', (notification) => {
-        // Here you would dispatch an action to add the notification
-        console.log('New notification:', notification);
+        // Log the notification and dispatch action to add it to the store
+        console.log('New notification received:', notification);
+        
+        // Ensure the notification is properly added to Redux store
+        dispatch(addRealTimeNotification(notification));
+        
+        // You could also use a toast notification here if desired
+        // toast.success(`New notification: ${notification.title}`);
       });
-
-      return () => {
-        socket.disconnect();
-      };
     }
-  }, [isAuthenticated, user]);
+    
+    // Cleanup function
+    return () => {
+      if (socket) {
+        console.log('Socket disconnecting');
+        socket.off('notification');
+        socket.off('connect');
+        socket.off('connect_error');
+        socket.disconnect();
+      }
+    };
+  }, [isAuthenticated, user, dispatch]);
 
   return (
     <Routes>

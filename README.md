@@ -74,6 +74,7 @@ A full-stack web application for tracking job applications with user authenticat
    JWT_SECRET=your_jwt_secret
    NODE_ENV=development
    CLIENT_URL=http://localhost:3000
+   ADMIN_INVITE_SECRET=your_strong_admin_secret_key_here
    ```
 
 4. Start the server:
@@ -124,6 +125,28 @@ A full-stack web application for tracking job applications with user authenticat
 3. Set the build command: `npm install`
 4. Set the start command: `npm start`
 5. Configure environment variables
+
+## Security Features
+
+### User Registration
+- Regular users can register with 'applicant' role only
+- The system enforces the default role of 'applicant' for all new registrations
+
+### Admin Account Creation
+There are two secure ways to create admin accounts:
+
+1. **Using Admin Invite Code**
+   - Admin invite codes are generated using a secure algorithm that includes the `ADMIN_INVITE_SECRET` environment variable
+   - Invite codes are time-limited and expire after one month
+   - Users can register as admin by visiting `/register-admin` and providing a valid invite code
+
+2. **Using Existing Admin Account**
+   - Existing admin users can create new admin users through the admin dashboard
+   - This requires authentication and proper authorization
+
+### Role-based Authorization
+- Protected routes verify user roles before allowing access
+- Admin-specific actions require admin role permission
 
 ## License
 MIT

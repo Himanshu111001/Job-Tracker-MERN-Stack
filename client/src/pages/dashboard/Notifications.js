@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getNotifications, markAsRead } from '../../redux/notifications/notificationsSlice';
+import { getNotifications, markNotificationRead } from '../../redux/notifications/notificationSlice';
 import { formatDate } from '../../utils/formatters';
 
 const Notifications = () => {
@@ -9,10 +9,10 @@ const Notifications = () => {
 
   useEffect(() => {
     dispatch(getNotifications());
-  }, [dispatch]);
-
-  const handleMarkAsRead = (notificationId) => {
-    dispatch(markAsRead(notificationId));
+  }, [dispatch]);  const handleMarkAsRead = (notificationId) => {
+    if (notificationId) {
+      dispatch(markNotificationRead(notificationId));
+    }
   };
 
   // Group notifications by date (today, yesterday, this week, earlier)
@@ -53,8 +53,11 @@ const Notifications = () => {
       <div className="mt-6">
         <h3 className="text-sm font-medium text-gray-500">{title}</h3>
         <ul className="mt-2 divide-y divide-gray-200">
-          {notifications.map((notification) => (
-            <li key={notification._id} className={`py-4 ${!notification.read ? 'bg-blue-50' : ''}`}>
+          {notifications.map((notification, index) => (
+            <li 
+              key={notification._id || `notification-${title}-${index}`} 
+              className={`py-4 ${!notification.read ? 'bg-blue-50' : ''}`}
+            >
               <div className="flex space-x-3">
                 <div className="flex-shrink-0">
                   {renderNotificationIcon(notification.type)}
@@ -64,8 +67,7 @@ const Notifications = () => {
                     <h4 className="text-sm font-medium text-gray-900">{notification.title}</h4>
                     <p className="text-xs text-gray-500">{formatTime(notification.createdAt)}</p>
                   </div>
-                  <p className="text-sm text-gray-500">{notification.message}</p>
-                  {!notification.read && (
+                  <p className="text-sm text-gray-500">{notification.message}</p>                  {!notification.read && notification._id && (
                     <button
                       onClick={() => handleMarkAsRead(notification._id)}
                       className="mt-1 text-xs text-indigo-600 hover:text-indigo-800"

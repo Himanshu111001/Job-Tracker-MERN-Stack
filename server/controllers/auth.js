@@ -11,7 +11,7 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     // Check if user already exists
     let user = await User.findOne({ email });
@@ -23,12 +23,12 @@ exports.register = async (req, res, next) => {
       });
     }
 
-    // Create user
+    // Create user with enforced 'applicant' role
     user = await User.create({
       name,
       email,
       password,
-      role: role || 'applicant'
+      role: 'applicant' // Enforce default role regardless of what's sent from frontend
     });
 
     sendTokenResponse(user, 201, res);
@@ -105,17 +105,29 @@ exports.getMe = async (req, res, next) => {
 
 // @desc    Log user out / clear cookie
 // @route   GET /api/auth/logout
-// @access  Private
+// @access  Public (changed from Private)
 exports.logout = (req, res, next) => {
-  res.cookie('token', 'none', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
-  });
+  try {
+    // Clear the cookie if it exists
+    res.cookie('token', 'none', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
 
-  res.status(200).json({
-    success: true,
-    data: {}
-  });
+    res.status(200).json({
+      success: true,
+      message: 'User logged out successfully',
+      data: {}
+    });
+  } catch (err) {
+    console.error('Logout error:', err);
+    res.status(500).json({
+      success: false,
+      error: 'Error during logout'
+    });
+  }
 };
 
 // Get token from model, create cookie and send response

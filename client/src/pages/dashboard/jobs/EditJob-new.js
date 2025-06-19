@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getJobById, updateJob, resetJobState } from '../../../redux/jobs/jobSlice';
+import { getJobById, updateJob } from '../../../redux/jobs/jobsSlice';
 
 const EditJob = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { jobId } = useParams();
-  const { job, loading: jobsStatus } = useSelector((state) => state.jobs);
+  const { job, status: jobsStatus } = useSelector((state) => state.jobs);
+
   const [formData, setFormData] = useState({
     company: '',
     title: '',
@@ -21,25 +22,15 @@ const EditJob = () => {
     salary: '',
     link: ''
   });
-    // Debug: Log job state changes
-  useEffect(() => {
-    console.log("Current job state:", job);
-    console.log("Current loading status:", jobsStatus);
-  }, [job, jobsStatus]);
+
   // Fetch job details when component mounts
   useEffect(() => {
-    console.log("Fetching job details for ID:", jobId);
     dispatch(getJobById(jobId));
-    
-    // Clean up when component unmounts
-    return () => {
-      dispatch(resetJobState());
-    };
   }, [dispatch, jobId]);
+
   // Populate form when job details are fetched
   useEffect(() => {
     if (job) {
-      console.log("Populating form with job data:", job);
       setFormData({
         company: job.company || '',
         title: job.title || '',
@@ -72,20 +63,15 @@ const EditJob = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };  const handleSubmit = async (e) => {
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitting form data:", formData);
-    console.log("Job ID for update:", jobId);
-    
-    try {
-      // Ensure we're using 'id' instead of 'jobId' to match the expected parameter in the thunk
-      const result = await dispatch(updateJob({ id: jobId, jobData: formData })).unwrap();
-      console.log("Update successful:", result);
-      navigate(`/dashboard/jobs/${jobId}`);
-    } catch (error) {
-      console.error("Error updating job:", error);
-      // Here you could add a toast notification or other user feedback about the error
-    }
+    dispatch(updateJob({ jobId, jobData: formData })).then((result) => {
+      if (!result.error) {
+        navigate(`/dashboard/jobs/${jobId}`);
+      }
+    });
   };
 
   return (
@@ -107,7 +93,8 @@ const EditJob = () => {
           </button>
         </div>
       </div>
-        {jobsStatus ? (
+      
+      {jobsStatus === 'loading' ? (
         <div className="text-center py-10">
           <p className="text-gray-500">Loading job details...</p>
         </div>
@@ -291,10 +278,10 @@ const EditJob = () => {
             </button>
             <button
               type="submit"
-              disabled={jobsStatus}
+              disabled={jobsStatus === 'loading'}
               className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-75"
             >
-              {jobsStatus ? 'Updating...' : 'Update Job Application'}
+              {jobsStatus === 'loading' ? 'Updating...' : 'Update Job Application'}
             </button>
           </div>
         </form>

@@ -73,6 +73,8 @@ export const updateJob = createAsyncThunk(
   'jobs/updateJob',
   async ({ id, jobData }, thunkAPI) => {
     try {
+      console.log("Updating job with ID:", id);
+      console.log("Job data:", jobData);
       return await jobService.updateJob(id, jobData);
     } catch (error) {
       const message = 
